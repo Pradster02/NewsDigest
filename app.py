@@ -169,6 +169,7 @@ def register():
 
 @app.route('/pythonlogin/home')
 def home():
+    print(session)
     # Check if the user is logged in
     if 'loggedin' in session:
         # def process_url():
