@@ -26,10 +26,10 @@ app.secret_key = 'your secret key'
 # app.config['MYSQL_DB'] = 'pythonlogin'
 
 connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="password",
-        database="pythonlogin",
+        host="sql6.freemysqlhosting.net",
+        user="sql6705599",
+        password="Q8EbaK3UHX",
+        database="sql6705599",
         auth_plugin='mysql_native_password'
     )
 
