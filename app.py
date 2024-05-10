@@ -199,7 +199,8 @@ def home():
         table += "</table>"
         return render_template('home.html', username=session['username'], table = table)
     # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/pythonlogin/profile')
 def profile():
