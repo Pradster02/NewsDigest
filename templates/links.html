@@ -5,16 +5,21 @@
 {% block content %}
 <h2>Manage Links</h2>
 <div>
-    Hello, {{ username }}!
     <br><br>
-    <div class="w3-container w3-center"><h3>Enter your document link Here</h3>
-        <form method="POST" action="/pythonlogin/links">
-            <input  type="text" name="site" placeholder="Enter Site Name Here" required="true"  style="width:50%">
-        <br><br>     
-            <input  type="text" name="input_url" placeholder="Enter URL Here" required="true"  style="width:50%">
-        <br><br>
-                  <button class="w3-btn w3-blue-grey" type="reset" value="reset">Clear</button>
-                  <button class="w3-btn w3-teal" type="submit" value="reset">Add link</button>
+    <div class="w3-container w3-center"><h3>Enter the site link Here</h3>
+        <form method="POST" action="/pythonlogin/links" class="form-container">
+            <div class="form-group">
+                <input type="text" name="site" placeholder="Enter Site Name Here" required="true" style="width:50%">
+            </div>
+            <br>
+            <div class="form-group">
+                <input type="text" name="input_url" placeholder="Enter URL Here" required="true" style="width:50%">
+            </div>
+            <br>
+            <div class="button-container">
+                <button class="btn btn-clear" type="reset">Clear</button>
+                <button class="btn btn-submit" type="submit">Add link</button>
+            </div>
         </form>
         <br><br>
 </div>
