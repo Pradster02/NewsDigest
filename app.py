@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen, Request
 from datetime import date
 from spacy.lang.en.stop_words import STOP_WORDS
+from urllib.parse import urlparse
 from string import punctuation
 # Import Heapq for Finding the Top N Sentences
 from heapq import nlargest
@@ -172,13 +173,6 @@ def home():
     print(session)
     # Check if the user is logged in
     if 'loggedin' in session:
-        # def process_url():
-        #  if request.method == 'POST':
-        #     input_url = request.form['input_url']
-        #     input_url = request.form['input_url']
-        #     raw_text = get_text(input_url)
-        #     final_summary = text_summarizer(raw_text)
-        #     # User is loggedin show them the home page
         cursor = connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(f'SELECT * FROM links WHERE accname = "{session["username"]}";')
         table = '''
@@ -194,11 +188,21 @@ def home():
             link = linkData[2]
             raw_text = get_text(link)
             final_summary = text_summarizer(raw_text)
+            # Split the summarized text at each full stop
+            summary_segments = final_summary.split('. ')
+            # Add a bullet point before each segment
+            summary_with_bullet = '<br>• '.join(summary_segments)
+            # Prepend bullet point to the first segment
+            summary_with_bullet = '• ' + summary_with_bullet
             table += f'''
-            <tr><td style="padding: 10px; border: 3px solid black; font-weight: bold;">{linkName}</td><td style="padding: 10px; border: 3px solid black">{final_summary}</td></tr>
+            <tr>
+                <td style="padding: 10px; border: 3px solid black; font-weight: bold;">{linkName}</td>
+                <td style="padding: 10px; border: 3px solid black">{summary_with_bullet}</td>
+            </tr>
             '''
         table += "</table>"
-        return render_template('home.html', username=session['username'], table = table)
+        return render_template('home.html', username=session['username'], table=table)
+
     # User is not loggedin redirect to login page
     else:
         return redirect(url_for('login'))
@@ -256,14 +260,6 @@ def links():
     # Check if the user is logged in
     else:
         if 'loggedin' not in session:
-            # def process_url():
-            #  if request.method == 'POST':
-            #     input_url = request.form['input_url']
-            #     input_url = request.form['input_url']
-            #     raw_text = get_text(input_url)
-            #     final_summary = text_summarizer(raw_text)
-            #     # User is loggedin show them the home page
-        # User is not loggedin redirect to login page
             return redirect(url_for('login'))
     if "loggedin" in session:
         cursor = connection.cursor(MySQLdb.cursors.DictCursor)
@@ -331,25 +327,20 @@ def process_url():
     start = time.time()
     if request.method == 'POST':
         if 'loggedin' in session:
-            site = request.form['site']
-            link = request.form['input_url']
-            userid = session["id"]
+           link = request.form['input_url']
+           site = request.form['site']
+            
+           # If the 'site' field is empty, extract the domain name from the 'link' URL
+           if not site:
+                parsed_url = urlparse(link)
+                site = parsed_url.netloc
+            
+           userid = session["id"]
             # We need all the account info for the user so we can display it on the profile page
-            cursor = connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute('INSERT INTO links (site_name, url, accname) VALUES (%s, %s, %s)', (site, link, userid,))
+           cursor = connection.cursor(MySQLdb.cursors.DictCursor)
+           cursor.execute('INSERT INTO links (site_name, url, accname) VALUES (%s, %s, %s)', (site, link, userid,))
             # Show the profile page with account info
-            return redirect(url_for("/pythonlogin/links?success=true"))
+           return redirect(url_for("/pythonlogin/links?success=true"))
         # User is not logged in redirect to login page
         return redirect(url_for('login'))
-        # input_url = request.form['input_url']
-        # raw_text = get_text(input_url)
-        # final_reading_time = readingTime(raw_text)
-        # final_summary = text_summarizer(raw_text)
-        # summary_reading_time = readingTime(final_summary)
-        # end = time.time()
-        # final_time = end-start
-    # return render_template('result.html',ctext=raw_text,
-    #                     final_summary=final_summary,
-    #                     final_time=final_time,
-    #                     final_reading_time=final_reading_time,
-    #                     summary_reading_time=summary_reading_time)
+    
