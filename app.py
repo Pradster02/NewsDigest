@@ -1,7 +1,5 @@
-# hello
 from __future__ import unicode_literals
 from flask import Flask, render_template, request, redirect, url_for, session
-# from flask_mysqldb import MySQL
 import mysql.connector
 import MySQLdb.cursors
 import MySQLdb.cursors, re, hashlib
@@ -13,12 +11,9 @@ from datetime import date
 from spacy.lang.en.stop_words import STOP_WORDS
 from urllib.parse import urlparse
 from string import punctuation
-# Import Heapq for Finding the Top N Sentences
 from heapq import nlargest
-
 app = Flask(__name__)
 nlp = spacy.load('en_core_web_sm')
-# Change this to your secret key (it can be anything, it's for extra protection)
 app.secret_key = 'your secret key'
 
 # Enter your database connection details below
@@ -46,7 +41,7 @@ def text_summarizer(raw_docx):
     raw_text = raw_docx
     docx = nlp(raw_text)
     stopwords = list(STOP_WORDS)
-    # Build Word Frequency # word.text is tokenization in spacy
+    # Build Word Frequency word.text is tokenization in spacy
     word_frequencies = {}  
     for word in docx:  
         if word.text not in stopwords:
@@ -60,10 +55,7 @@ def text_summarizer(raw_docx):
 
     for word in word_frequencies.keys():  
         word_frequencies[word] = (word_frequencies[word]/maximum_frequncy)
-    # Sentence Tokens
     sentence_list = [ sentence for sentence in docx.sents ]
-
-    # Sentence Scores
     sentence_scores = {}  
     for sent in sentence_list:  
         for word in sent:
@@ -73,15 +65,12 @@ def text_summarizer(raw_docx):
                         sentence_scores[sent] = word_frequencies[word.text.lower()]
                     else:
                         sentence_scores[sent] += word_frequencies[word.text.lower()]
-
-
     summarized_sentences = nlargest(7, sentence_scores, key=sentence_scores.get)
     final_sentences = [ w.text for w in summarized_sentences ]
     summary = ' '.join(final_sentences)
     return summary
 
-def readingTime(mytext):
-    
+def readingTime(mytext):   
     total_words = len([ token.text for token in nlp(mytext)])
     estimatedTime = total_words/200.0
     return estimatedTime
@@ -176,10 +165,10 @@ def home():
         cursor = connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(f'SELECT * FROM links WHERE accname = "{session["username"]}";')
         table = '''
-        <table style="background: white;">
+        <table style="background: white;" class="table">
             <tr>
-                <th style="padding: 10px; border: 3px solid black">Link Name</th>
-                <th style="padding: 10px; border: 3px solid black">Summarized Text</th>
+                <th style="padding: 10px; border: 3px solid black" scope="col">Link Name</th>
+                <th style="padding: 10px; border: 3px solid black" scope="col">Summarized Text</th>
             </tr>
         '''
         links = cursor.fetchall()
@@ -211,7 +200,6 @@ def home():
 def profile():
     # Check if the user is logged in
     if 'loggedin' in session:
-        # We need all the account info for the user so we can display it on the profile page
         cursor = connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE id = %s', (session['id'],))
         account = cursor.fetchone()
@@ -265,11 +253,11 @@ def links():
         cursor = connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(f'SELECT * FROM links WHERE accname = "{session["username"]}";')
         table = '''
-            <table style="background: white;">
+            <table style="background: white; width: 100%;" class="table">
                 <tr>
-                    <th style="padding: 10px; border: 3px solid black">Link Name</th>
-                    <th style="padding: 10px; border: 3px solid black">Link URL</th>
-                    <th style="padding: 10px; border: 3px solid black">Action</th>
+                    <th style="padding: 10px; border: 3px solid black" scope="col">Link Name</th>
+                    <th style="padding: 10px; border: 3px solid black" scope="col">Link URL</th>
+                    <th style="padding: 10px; border: 3px solid black" scope="col">Action</th>
                 </tr>
         '''
         links = cursor.fetchall()
@@ -294,7 +282,6 @@ def links():
  
 @app.route('/', methods=['GET', 'POST'])
 def index():
-     # Output a message if something goes wrong...
     msg = ''
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
@@ -322,9 +309,6 @@ def index():
             msg = 'Incorrect username/password!'
     # Show the login form with message (if any)
     return render_template('web.html', msg=msg)
-
-
-
 
 def get_text(url):
     req = Request(url,headers={'User-Agent' : "Magic Browser"})
@@ -356,14 +340,10 @@ def process_url():
         if 'loggedin' in session:
            link = request.form['input_url']
            site = request.form['site']
-            
-           # If the 'site' field is empty, extract the domain name from the 'link' URL
            if not site:
                 parsed_url = urlparse(link)
-                site = parsed_url.netloc
-            
+                site = parsed_url.netloc  
            userid = session["id"]
-            # We need all the account info for the user so we can display it on the profile page
            cursor = connection.cursor(MySQLdb.cursors.DictCursor)
            cursor.execute('INSERT INTO links (site_name, url, accname) VALUES (%s, %s, %s)', (site, link, userid,))
             # Show the profile page with account info
