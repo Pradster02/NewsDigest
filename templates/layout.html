@@ -1,23 +1,59 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>{% block title %}{% endblock %}</title>
-		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-	</head>
-	<body class="loggedin">
-		<nav class="navtop">
-			<div>
-				<h1>News Digest</h1>
-                <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
-				<a href="{{ url_for('links') }}"><i class="fas fa-home"></i>Links</a>
-				<a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
-				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
-			</div>
-		</nav>
-		<div class="content">
-			{% block content %}{% endblock %}
-		</div>
-	</body>
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #697077; /* Light gray background */
+        }
+        .navtop {
+            background-color: #343a40; /* Dark background for navigation bar */
+            color: #fff; /* White text */
+            padding: 10px 0;
+        }
+        .navtop div {
+            max-width: 1200px;
+            margin: auto;
+            text-align: center;
+        }
+        .navtop a {
+            color: #fff; /* White text */
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+        .navtop a:hover {
+            background-color: #495057; /* Darker background on hover */
+        }
+        .content {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            background-color: #fff; /* White content background */
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+    </style>
+</head>
+<body>
+<nav class="navtop">
+    <div>
+        <h1>News Digest</h1>
+        <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
+        <a href="{{ url_for('links') }}"><i class="fas fa-link"></i>Links</a>
+        <a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
+        <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
+    </div>
+</nav>
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+</body>
 </html>
