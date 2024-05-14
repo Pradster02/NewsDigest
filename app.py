@@ -227,13 +227,25 @@ def links():
             if "site" in request.form:
                 site = request.form['site']
                 link = request.form['input_url']
-                userid = session["username"]
-                # We need all the account info for the user so we can display it on the profile page
-                cursor = connection.cursor(MySQLdb.cursors.DictCursor)
-                cursor.execute('INSERT INTO links (site_name, url, accname) VALUES (%s, %s, %s)', (site, link, userid,))
-                connection.commit()
-                # Show the profile page with account info
-                msg = "<script>alert('Successfully added the link.');</script>"
+                if get_text(link) == "Invalid Link":
+                    msg = "<script>alert('Invalid Link.');</script>"
+                else:
+                    userid = session["username"]
+                    # We need all the account info for the user so we can display it on the profile page
+                    cursor = connection.cursor(MySQLdb.cursors.DictCursor)
+                    cursor.execute(f'SELECT * FROM links WHERE accname = "{userid}" AND url = "{link}";')
+                    links = cursor.fetchall()
+                    found = False
+                    for linkData in links:
+                        found = True
+                        break
+                    if not found:
+                        cursor.execute('INSERT INTO links (site_name, url, accname) VALUES (%s, %s, %s)', (site, link, userid,))
+                        connection.commit()
+                        # Show the profile page with account info
+                        msg = "<script>alert('Successfully added the link.');</script>"
+                    else:
+                        msg = "<script>alert('Link already exists.');</script>"
             else:
                 linkid = ""
                 for x in request.form:
@@ -311,11 +323,14 @@ def index():
     return render_template('web.html', msg=msg)
 
 def get_text(url):
-    req = Request(url,headers={'User-Agent' : "Magic Browser"})
-    page = urlopen(req)
-    soup = BeautifulSoup(page)
-    fetched_text = ' '.join(map(lambda p:p.text,soup.find_all('p')))
-    return fetched_text
+    try:
+        req = Request(url,headers={'User-Agent' : "Magic Browser"})
+        page = urlopen(req)
+        soup = BeautifulSoup(page)
+        fetched_text = ' '.join(map(lambda p:p.text,soup.find_all('p')))
+        return fetched_text
+    except:
+        return "Invalid Link"
 
 
 @app.route('/process',methods=['GET','POST'])
